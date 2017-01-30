@@ -1,5 +1,5 @@
 
-from debian-wheezy-python2
+from nukai/debian-wheezy-python2
 
 RUN apt-get install -y build-essential python2.7-dev python-virtualenv
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
