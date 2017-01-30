@@ -36,7 +36,7 @@ def gen_docker_file(os, version, py, testing=False):
         fd.write(dockerfile)
     subprocess.call(['rm', '-f', 'build.py'])
     subprocess.check_call(['git', 'add', '-A'])
-    subprocess.call(['git', 'ci', '-m', 'update'])
+    subprocess.call(['git', 'commit', '-m', 'update'])
     if '--push' in sys.argv:
         subprocess.call(['git', 'push', 'origin', branch])
 
@@ -65,7 +65,7 @@ def main():
         with open('Dockerfile', 'w') as fd:
             fd.write(dockerfile)
         subprocess.check_call(['git', 'add', 'Dockerfile'])
-        subprocess.call(['git', 'ci', '-m', 'update'])
+        subprocess.call(['git', 'commit', '-m', 'update'])
         if '--push' in sys.argv:
             subprocess.call(['git', 'push', 'origin', 'master'])
 
