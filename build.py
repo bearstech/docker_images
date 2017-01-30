@@ -7,7 +7,7 @@ RUN apt-get update && apt-get -y dist-upgrade && apt-get install -y python{py}
 '''
 
 TESTING = r'''
-RUN apt-get install build-essential python{py}-dev python-virtualenv
+RUN apt-get install -y build-essential python{py}-dev python-virtualenv
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage && \
@@ -53,6 +53,12 @@ def main():
         debian()
     finally:
         subprocess.call(['git', 'co', 'master'])
+        with open('Dockerfile') as fd:
+            dockerfile = fd.read()
+        with open('Dockerfile', 'w') as fd:
+            fd.write(dockerfile)
+        subprocess.check_call(['git', 'add', 'Dockerfile'])
+        subprocess.check_call(['git', 'ci', '-m', 'update'])
 
 
 if __name__ == '__main__':
