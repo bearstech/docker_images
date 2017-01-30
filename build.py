@@ -28,6 +28,10 @@ def gen_docker_file(os, version, py, testing=False):
     print(dockerfile)
     subprocess.call(['git', 'branch', branch])
     subprocess.check_call(['git', 'co', branch])
+    with open('Dockerfile', 'w') as fd:
+        fd.write(dockerfile)
+    subprocess.check_call(['git', 'add', 'Dockerfile'])
+    subprocess.check_call(['git', 'ci', '-m', 'update'])
 
 
 debians = (
