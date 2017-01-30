@@ -1,7 +1,5 @@
 
-from debian:jessie
-
-RUN apt-get update && apt-get -y dist-upgrade && apt-get install -y python3
+from debian-jessie-python3
 
 RUN apt-get install -y build-essential python3-dev python-virtualenv
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
