@@ -14,6 +14,7 @@ RUN apt-get install -y build-essential python{py}-dev python-virtualenv
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
+
 '''
 
 all_branches = []
