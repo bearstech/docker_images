@@ -24,7 +24,7 @@ def gen_docker_file(os, version, py, testing=False):
     if py == '2':
         py = '2.7'
     if testing:
-        image = branch
+        image = 'nukai/' + branch
         branch += '-testing'
         dockerfile = DEBIAN_TESTING.format(image=image, py=py)
     else:
