@@ -57,14 +57,15 @@ debians = (
 def debian():
     for deb, pyvers in debians:
         for py in pyvers:
-            gen_docker_file('debian', deb, py, testing=True)
             gen_docker_file('debian', deb, py)
+            gen_docker_file('debian', deb, py, testing=True)
 
 
 def main():
     try:
         debian()
     finally:
+        subprocess.call(['git', 'co', 'debian-stretch-python3'])
         with open('Dockerfile') as fd:
             dockerfile = fd.read()
         subprocess.call(['git', 'co', 'master'])
