@@ -2,12 +2,14 @@ import subprocess
 import sys
 
 DEBIAN = '''
-from {os}:{version}
+from {image}
 
 RUN apt-get update && apt-get -y dist-upgrade && apt-get install -y python{py}
 '''
 
 DEBIAN_TESTING = r'''
+from {image}
+
 RUN apt-get install -y build-essential python{py}-dev python-virtualenv
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
@@ -21,10 +23,13 @@ def gen_docker_file(os, version, py, testing=False):
     branch = '%s-%s-python%s' % (os, version, py)
     if py == '2':
         py = '2.7'
-    dockerfile = DEBIAN.format(os=os, version=version, py=py)
     if testing:
+        image = branch
         branch += '-testing'
-        dockerfile += DEBIAN_TESTING.format(py=py)
+        dockerfile = DEBIAN_TESTING.format(image=image, py=py)
+    else:
+        image = '{os}:{version}'
+        dockerfile = DEBIAN.format(image=image, py=py)
 
     print(branch)
     print('==========================================')
