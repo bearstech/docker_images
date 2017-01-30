@@ -1,20 +1,27 @@
 import subprocess
 import sys
 
-DEBIAN = '''
+DEBIAN = r'''
 from {image}
 
-RUN apt-get update && apt-get -y dist-upgrade && apt-get install -y python{py}
+RUN apt-get update && apt-get -y dist-upgrade && \
+    apt-get install -y python{py} && \
+    apt-get clean
+
+CMD ['bash', '-c', 'while true; do sleep 9999999999999999999; done']
 '''
 
 DEBIAN_TESTING = r'''
 from {image}
 
-RUN apt-get install -y build-essential python{py}-dev python-virtualenv
+RUN apt-get install -y \
+        build-essential python{py}-dev python-virtualenv && \
+    apt-get clean
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
 
+CMD ['bash', '-c', 'while true; do sleep 9999999999999999999; done']
 '''
 
 all_branches = []
