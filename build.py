@@ -27,7 +27,7 @@ def gen_docker_file(os, version, py, testing=False):
     print('==========================================')
     print(dockerfile)
     subprocess.call(['git', 'branch', branch])
-    subprocess.call(['git', 'co', branch])
+    subprocess.check_call(['git', 'co', branch])
 
 
 debians = (
@@ -36,7 +36,20 @@ debians = (
     ('stretch', ('2', '3')),
 )
 
-for deb, pyvers in debians:
-    for py in pyvers:
-        gen_docker_file('debian', deb, py)
-        gen_docker_file('debian', deb, py, testing=True)
+
+def debian():
+    for deb, pyvers in debians:
+        for py in pyvers:
+            gen_docker_file('debian', deb, py)
+            gen_docker_file('debian', deb, py, testing=True)
+
+
+def main():
+    try:
+        debian()
+    finally:
+        subprocess.call(['git', 'co', 'master'])
+
+
+if __name__ == '__main__':
+    main()
