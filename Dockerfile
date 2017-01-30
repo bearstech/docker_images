@@ -1,5 +1,5 @@
 
-from nukai/debian-jessie-python3
+from bearstech/nukai:debian-jessie-python3
 
 RUN apt-get install -y build-essential python3-dev python-virtualenv
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
