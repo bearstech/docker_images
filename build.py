@@ -52,11 +52,11 @@ def main():
     try:
         debian()
     finally:
-        subprocess.call(['git', 'co', 'master'])
         with open('Dockerfile') as fd:
             dockerfile = fd.read()
         with open('Dockerfile', 'w') as fd:
             fd.write(dockerfile)
+        subprocess.call(['git', 'co', 'master'])
         subprocess.check_call(['git', 'add', 'Dockerfile'])
         subprocess.check_call(['git', 'ci', '-m', 'update'])
 
