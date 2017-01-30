@@ -28,7 +28,7 @@ def gen_docker_file(os, version, py, testing=False):
         branch += '-testing'
         dockerfile = DEBIAN_TESTING.format(image=image, py=py)
     else:
-        image = '{os}:{version}'
+        image = '{os}:{version}'.format(os=os, version=version)
         dockerfile = DEBIAN.format(image=image, py=py)
 
     print(branch)
