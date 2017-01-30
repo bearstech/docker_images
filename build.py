@@ -57,8 +57,8 @@ debians = (
 def debian():
     for deb, pyvers in debians:
         for py in pyvers:
-            gen_docker_file('debian', deb, py)
             gen_docker_file('debian', deb, py, testing=True)
+            gen_docker_file('debian', deb, py)
 
 
 def main():
