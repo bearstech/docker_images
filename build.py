@@ -8,7 +8,7 @@ from {image}
 
 RUN apt-get update && apt-get -y dist-upgrade && \
     apt-get install -y python{py} ca-certificates adduser curl && \
-    apt-get clean
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 CMD ["/bin/bash", "-c", "while true; do sleep 99999999999999; done"]
 ''',
@@ -17,7 +17,8 @@ from {image}
 
 RUN apt-get install -y \
         build-essential python{py}-dev python-virtualenv && \
-    apt-get clean
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
