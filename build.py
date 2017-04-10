@@ -15,7 +15,7 @@ CMD ["/bin/bash", "-c", "while true; do sleep 99999999999999; done"]
     debian_testing=r'''
 from {image}
 
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
         build-essential python{py}-dev python-virtualenv && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
