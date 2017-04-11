@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 import subprocess
+import time
 import sys
+
+sleep = str(int(time.time()))
+
 
 TEMPLATES = dict(
     debian=r'''
 from {image}
 
 RUN apt-get update && apt-get -y dist-upgrade && \
-    apt-get install -y python{py} ca-certificates adduser curl && \
+    apt-get install -y python{py} ca-certificates adduser curl gnupg && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-CMD ["/bin/bash", "-c", "while true; do sleep 99999999999999; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
     debian_testing=r'''
 from {image}
@@ -23,13 +27,13 @@ RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
 
-CMD ["/bin/bash", "-c", "while true; do sleep 99999999999999; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
 
     centos=r'''
 from {image}
 
-CMD ["/bin/bash", "-c", "while true; do sleep 99999999999999; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
     centos_testing=r'''
 from {image}
@@ -42,7 +46,7 @@ RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
 
-CMD ["/bin/bash", "-c", "while true; do sleep 99999999999999; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
 )
 
@@ -56,10 +60,11 @@ def gen_docker_file(os, version, py, testing=False):
     if testing:
         image = 'bearstech/nukai:' + branch
         branch += '-testing'
-        dockerfile = TEMPLATES[os + '_testing'].format(image=image, py=py)
+        dockerfile = TEMPLATES[os + '_testing'].format(
+            image=image, py=py, sleep=sleep)
     else:
         image = '{os}:{version}'.format(os=os, version=version)
-        dockerfile = TEMPLATES[os].format(image=image, py=py)
+        dockerfile = TEMPLATES[os].format(image=image, py=py, sleep=sleep)
 
     print(branch)
     print('==========================================')
