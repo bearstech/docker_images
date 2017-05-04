@@ -49,7 +49,7 @@ COPY 01_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
 COPY build.sh /docker_build.sh
 COPY clean.sh /docker_clean.sh
 
-RUN bash /docker_build.sh
+RUN bash /docker_build.sh && bash /docker_clean.sh
 
 CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
@@ -60,9 +60,8 @@ RUN apt-get update && apt-get install -y \
         build-essential python{py}-dev python-virtualenv && \
     mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
-    /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
-
-{clean}
+    /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage && \
+    bash /docker_clean.sh
 
 CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
