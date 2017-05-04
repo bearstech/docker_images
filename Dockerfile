@@ -1,4 +1,4 @@
 
 from centos:7
 
-CMD ["/bin/bash", "-c", "while true; do sleep 1493931647; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep 1493932001; done"]
