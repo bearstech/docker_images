@@ -1,7 +1,7 @@
 
 from bearstech/nukai:debian-jessie-python3
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
         build-essential python3-dev python-virtualenv
 
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
@@ -16,4 +16,4 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /usr/share/doc/*
 
-CMD ["/bin/bash", "-c", "while true; do sleep 1493924191; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep 1493925356; done"]
