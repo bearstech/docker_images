@@ -8,7 +8,7 @@ RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python3 /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
 
-RUN apt-clean && \
+RUN apt-get clean && \
     rm -rf /tmp/* /var/tmp/* && \
     rm -rf /etc/dpkg/dpkg.cfg.d/02apt-speedup && \
     rm -rf /usr/share/locale/* && \
@@ -16,4 +16,4 @@ RUN apt-clean && \
     rm -rf /var/lib/apt/lists/* && \
     rm -rf /usr/share/doc/*
 
-CMD ["/bin/bash", "-c", "while true; do sleep 1493923575; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep 1493924191; done"]
