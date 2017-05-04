@@ -7,4 +7,4 @@ COPY clean.sh /docker_clean.sh
 
 RUN bash /docker_build.sh 2.7 && bash /docker_clean.sh
 
-CMD ["/bin/bash", "-c", "while true; do sleep 1493930952; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep 1493930969; done"]
