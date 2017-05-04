@@ -5,28 +5,40 @@ import sys
 
 sleep = str(int(time.time()))
 
-DEBIAN_CLEAN = r'''
-RUN apt-get clean && \
-    rm -rf /root/.cache && \
-    rm -rf /tmp/* /var/tmp/* && \
-    rm -rf /etc/dpkg/dpkg.cfg.d/02apt-speedup && \
-    rm -rf /var/cache/debconf/*-old && \
-    rm -rf /var/lib/apt/lists/* && \
-    rm -rf /usr/share/doc/* && \
-    rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/* && \
-    rm -rf /usr/share/lintian/* /usr/share/linda/* /var/cache/man/*
+DEBIAN_CLEAN = '''
+apt-get clean
+rm -rf /root/.cache
+rm -rf /tmp/* /var/tmp/*
+rm -rf /etc/dpkg/dpkg.cfg.d/02apt-speedup
+rm -rf /var/cache/debconf/*-old
+rm -rf /var/lib/apt/lists/*
+rm -rf /usr/share/doc/*
+rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/*
+rm -rf /usr/share/lintian/* /usr/share/linda/* /var/cache/man/*
+'''
+
+DEBIAN_BUILD = r'''
+set -e
+
+apt-get update && apt-get -y dist-upgrade
+apt-get install -y --no-install-recommends \
+    python{py} locales ca-certificates adduser curl gnupg
+sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+echo 'LANG="en_US.UTF-8"' > /etc/default/locale
+dpkg-reconfigure --frontend=noninteractive locales
 '''
 
 DEBIAN_NODOC = r'''
 path-exclude /usr/share/doc/*
-# we need to keep copyright files for legal reasons
-path-include /usr/share/doc/*/copyright
 path-exclude /usr/share/man/*
 path-exclude /usr/share/groff/*
 path-exclude /usr/share/info/*
 # lintian stuff is small, but really unnecessary
 path-exclude /usr/share/lintian/*
 path-exclude /usr/share/linda/*
+path-exclude /usr/share/locale/*
+path-include /usr/share/locale/locale.alias
+path-include /usr/share/locale/en*
 '''
 
 TEMPLATES = dict(
@@ -34,16 +46,10 @@ TEMPLATES = dict(
 from {image}
 
 COPY 01_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
+COPY build.sh /docker_build.sh
+COPY clean.sh /docker_clean.sh
 
-RUN apt-get update && apt-get -y dist-upgrade && \
-    apt-get install -y --no-install-recommends \
-        python{py} locales ca-certificates adduser curl gnupg
-
-RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
-    echo 'LANG="en_US.UTF-8"'>/etc/default/locale && \
-    dpkg-reconfigure --frontend=noninteractive locales
-
-{clean}
+RUN bash /docker_build.sh
 
 CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
@@ -51,9 +57,8 @@ CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 from {image}
 
 RUN apt-get update && apt-get install -y \
-        build-essential python{py}-dev python-virtualenv
-
-RUN mkdir -p /tmp/nuka_provisionning/nuka && \
+        build-essential python{py}-dev python-virtualenv && \
+    mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
 
@@ -110,6 +115,10 @@ def gen_docker_file(os, version, py, testing=False):
     if branch.startswith('debian'):
         with open('01_nodoc', 'w') as fd:
             fd.write(DEBIAN_NODOC)
+        with open('build.sh', 'w') as fd:
+            fd.write(DEBIAN_BUILD)
+        with open('clean.sh', 'w') as fd:
+            fd.write(DEBIAN_CLEAN)
     subprocess.call(['rm', '-f', 'build.py'])
     subprocess.check_call(['git', 'add', '-A'])
     subprocess.call(['git', 'commit', '-m', 'update'])
@@ -144,15 +153,19 @@ def main():
         subprocess.call(['git', 'co', 'debian-stretch-python3'])
         with open('Dockerfile') as fd:
             dockerfile = fd.read()
-        with open('01_nodoc') as fd:
-            nodoc = fd.read()
         subprocess.call(['git', 'co', 'master'])
         with open('Dockerfile', 'w') as fd:
             fd.write(dockerfile)
         with open('01_nodoc', 'w') as fd:
-            fd.write(nodoc)
+            fd.write(DEBIAN_NODOC)
+        with open('build.sh', 'w') as fd:
+            fd.write(DEBIAN_BUILD)
+        with open('clean.sh', 'w') as fd:
+            fd.write(DEBIAN_CLEAN)
         subprocess.check_call(['git', 'add', 'Dockerfile'])
         subprocess.check_call(['git', 'add', '01_nodoc'])
+        subprocess.check_call(['git', 'add', 'build.sh'])
+        subprocess.check_call(['git', 'add', 'clean.sh'])
         subprocess.call(['git', 'commit', '-m', 'update'])
         if '--push' in sys.argv:
             subprocess.call(['git', 'push', 'origin', 'master'])
