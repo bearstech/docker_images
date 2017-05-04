@@ -6,6 +6,8 @@ import sys
 sleep = str(int(time.time()))
 
 DEBIAN_CLEAN = '''
+set -e
+
 apt-get clean
 rm -rf /root/.cache
 rm -rf /tmp/* /var/tmp/*
@@ -22,7 +24,7 @@ set -e
 
 apt-get update && apt-get -y dist-upgrade
 apt-get install -y --no-install-recommends \
-    python{py} locales ca-certificates adduser curl gnupg
+    python$1 locales ca-certificates adduser curl gnupg
 sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
 echo 'LANG="en_US.UTF-8"' > /etc/default/locale
 dpkg-reconfigure --frontend=noninteractive locales
@@ -49,7 +51,7 @@ COPY 01_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
 COPY build.sh /docker_build.sh
 COPY clean.sh /docker_clean.sh
 
-RUN bash /docker_build.sh && bash /docker_clean.sh
+RUN bash /docker_build.sh {py} && bash /docker_clean.sh
 
 CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
@@ -97,11 +99,11 @@ def gen_docker_file(os, version, py, testing=False):
         image = 'bearstech/nukai:' + branch
         branch += '-testing'
         dockerfile = TEMPLATES[os + '_testing'].format(
-            image=image, py=py, clean=DEBIAN_CLEAN, sleep=sleep)
+            image=image, py=py, sleep=sleep)
     else:
         image = '{os}:{version}'.format(os=os, version=version)
         dockerfile = TEMPLATES[os].format(
-            image=image, py=py, clean=DEBIAN_CLEAN, sleep=sleep)
+            image=image, py=py, sleep=sleep)
 
     print(branch)
     print('==========================================')
