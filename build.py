@@ -144,10 +144,15 @@ def main():
         subprocess.call(['git', 'co', 'debian-stretch-python3'])
         with open('Dockerfile') as fd:
             dockerfile = fd.read()
+        with open('01_nodoc') as fd:
+            nodoc = fd.read()
         subprocess.call(['git', 'co', 'master'])
         with open('Dockerfile', 'w') as fd:
             fd.write(dockerfile)
+        with open('01_nodoc', 'w') as fd:
+            fd.write(nodoc)
         subprocess.check_call(['git', 'add', 'Dockerfile'])
+        subprocess.check_call(['git', 'add', '01_nodoc'])
         subprocess.call(['git', 'commit', '-m', 'update'])
         if '--push' in sys.argv:
             subprocess.call(['git', 'push', 'origin', 'master'])
