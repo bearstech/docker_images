@@ -5,7 +5,10 @@ import sys
 
 sleep = str(int(time.time()))
 
-DEBIAN_CLEAN = '''
+DEBIAN_BUILD = r'''
+set -e
+
+cat <<-EOF > /docker_clean.sh
 set -e
 
 apt-get clean
@@ -17,20 +20,9 @@ rm -rf /var/lib/apt/lists/*
 rm -rf /usr/share/doc/*
 rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/*
 rm -rf /usr/share/lintian/* /usr/share/linda/* /var/cache/man/*
-'''
+EOF
 
-DEBIAN_BUILD = r'''
-set -e
-
-apt-get update && apt-get -y dist-upgrade
-apt-get install -y --no-install-recommends \
-    python$1 locales ca-certificates adduser curl gnupg
-sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
-echo 'LANG="en_US.UTF-8"' > /etc/default/locale
-dpkg-reconfigure --frontend=noninteractive locales
-'''
-
-DEBIAN_NODOC = r'''
+cat <<-EOF > /etc/dpkg/dpkg.cfg.d/01_nodoc
 path-exclude /usr/share/doc/*
 path-exclude /usr/share/man/*
 path-exclude /usr/share/groff/*
@@ -41,15 +33,21 @@ path-exclude /usr/share/linda/*
 path-exclude /usr/share/locale/*
 path-include /usr/share/locale/locale.alias
 path-include /usr/share/locale/en*
+EOF
+
+apt-get update && apt-get -y dist-upgrade
+apt-get install -y --no-install-recommends \
+    python$1 locales ca-certificates adduser curl gnupg
+sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen
+echo 'LANG="en_US.UTF-8"' > /etc/default/locale
+dpkg-reconfigure --frontend=noninteractive locales
 '''
 
 TEMPLATES = dict(
     debian=r'''
 from {image}
 
-COPY 01_nodoc /etc/dpkg/dpkg.cfg.d/01_nodoc
 COPY build.sh /docker_build.sh
-COPY clean.sh /docker_clean.sh
 
 RUN bash /docker_build.sh {py} && bash /docker_clean.sh
 
@@ -114,12 +112,8 @@ def gen_docker_file(os, version, py, testing=False):
     with open('Dockerfile', 'w') as fd:
         fd.write(dockerfile)
     if branch.startswith('debian'):
-        with open('01_nodoc', 'w') as fd:
-            fd.write(DEBIAN_NODOC)
         with open('build.sh', 'w') as fd:
             fd.write(DEBIAN_BUILD)
-        with open('clean.sh', 'w') as fd:
-            fd.write(DEBIAN_CLEAN)
     subprocess.call(['rm', '-f', 'build.py'])
     subprocess.check_call(['git', 'add', '-A'])
     subprocess.call(['git', 'commit', '-m', 'update'])
@@ -157,12 +151,8 @@ def main():
         subprocess.call(['git', 'co', 'master'])
         with open('Dockerfile', 'w') as fd:
             fd.write(dockerfile)
-        with open('01_nodoc', 'w') as fd:
-            fd.write(DEBIAN_NODOC)
         with open('build.sh', 'w') as fd:
             fd.write(DEBIAN_BUILD)
-        with open('clean.sh', 'w') as fd:
-            fd.write(DEBIAN_CLEAN)
         subprocess.check_call(['git', 'add', 'Dockerfile'])
         subprocess.check_call(['git', 'add', '01_nodoc'])
         subprocess.check_call(['git', 'add', 'build.sh'])
