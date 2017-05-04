@@ -1,6 +1,7 @@
 
 set -e
 
+echo /docker_clean.sh
 cat <<-EOF > /docker_clean.sh
 set -e
 
@@ -15,6 +16,7 @@ rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/*
 rm -rf /usr/share/lintian/* /usr/share/linda/* /var/cache/man/*
 EOF
 
+echo /etc/dpkg/dpkg.cfg.d/01_nodoc
 cat <<-EOF > /etc/dpkg/dpkg.cfg.d/01_nodoc
 path-exclude /usr/share/doc/*
 path-exclude /usr/share/man/*
