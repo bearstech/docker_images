@@ -10,27 +10,41 @@ TEMPLATES = dict(
     debian=r'''
 from {image}
 
+RUN apt-get update && apt-get -y dist-upgrade && \
+    apt-get install -y --no-install-recommends \
+        python{py} locales ca-certificates adduser curl gnupg
+
 RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
     echo 'LANG="en_US.UTF-8"'>/etc/default/locale && \
     dpkg-reconfigure --frontend=noninteractive locales
 
-RUN apt-get update && apt-get -y dist-upgrade && \
-    apt-get install -y \
-        python{py} locales ca-certificates adduser curl gnupg && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-clean && \
+    rm -rf /tmp/* /var/tmp/* && \
+    rm -rf /etc/dpkg/dpkg.cfg.d/02apt-speedup && \
+    rm -rf /usr/share/locale/* && \
+    rm -rf /var/cache/debconf/*-old && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /usr/share/doc/*
 
 CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
     debian_testing=r'''
 from {image}
 
-RUN apt-get update && apt-get install -y \
-        build-essential python{py}-dev python-virtualenv && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential python{py}-dev python-virtualenv
 
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python{py} /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
+
+RUN apt-clean && \
+    rm -rf /tmp/* /var/tmp/* && \
+    rm -rf /etc/dpkg/dpkg.cfg.d/02apt-speedup && \
+    rm -rf /usr/share/locale/* && \
+    rm -rf /var/cache/debconf/*-old && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm -rf /usr/share/doc/*
 
 CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
 ''',
