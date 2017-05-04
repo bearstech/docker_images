@@ -8,6 +8,7 @@ sleep = str(int(time.time()))
 DEBIAN_BUILD = r'''
 set -e
 
+echo /docker_clean.sh
 cat <<-EOF > /docker_clean.sh
 set -e
 
@@ -22,6 +23,7 @@ rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/*
 rm -rf /usr/share/lintian/* /usr/share/linda/* /var/cache/man/*
 EOF
 
+echo /etc/dpkg/dpkg.cfg.d/01_nodoc
 cat <<-EOF > /etc/dpkg/dpkg.cfg.d/01_nodoc
 path-exclude /usr/share/doc/*
 path-exclude /usr/share/man/*
@@ -114,7 +116,7 @@ def gen_docker_file(os, version, py, testing=False):
     if branch.startswith('debian'):
         with open('build.sh', 'w') as fd:
             fd.write(DEBIAN_BUILD)
-    subprocess.call(['rm', '-f', 'build.py'])
+    subprocess.call(['rm', '-f', 'build.py', 'clean.sh', '01_nodoc'])
     subprocess.check_call(['git', 'add', '-A'])
     subprocess.call(['git', 'commit', '-m', 'update'])
     if '--push' in sys.argv:
@@ -154,9 +156,7 @@ def main():
         with open('build.sh', 'w') as fd:
             fd.write(DEBIAN_BUILD)
         subprocess.check_call(['git', 'add', 'Dockerfile'])
-        subprocess.check_call(['git', 'add', '01_nodoc'])
         subprocess.check_call(['git', 'add', 'build.sh'])
-        subprocess.check_call(['git', 'add', 'clean.sh'])
         subprocess.call(['git', 'commit', '-m', 'update'])
         if '--push' in sys.argv:
             subprocess.call(['git', 'push', 'origin', 'master'])
