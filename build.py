@@ -31,7 +31,7 @@ CMD ["/bin/bash", "-c", "while true; do sleep {sleep}; done"]
     debian_testing=r'''
 from {image}
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN apt-get update && apt-get install -y \
         build-essential python{py}-dev python-virtualenv
 
 RUN mkdir -p /tmp/nuka_provisionning/nuka && \
