@@ -9,4 +9,4 @@ RUN mkdir -p /tmp/nuka_provisionning/nuka && \
     virtualenv -p python3 /tmp/nuka_provisionning/nuka && \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage
 
-CMD ["/bin/bash", "-c", "while true; do sleep 1493889038; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep 1493922554; done"]
