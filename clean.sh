@@ -1,4 +1,6 @@
 
+set -e
+
 apt-get clean
 rm -rf /root/.cache
 rm -rf /tmp/* /var/tmp/*
