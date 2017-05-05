@@ -8,4 +8,4 @@ RUN apt-get update && apt-get install -y \
     /tmp/nuka_provisionning/nuka/bin/pip install -U pip coverage && \
     bash /docker_clean.sh
 
-CMD ["/bin/bash", "-c", "while true; do sleep 1493932577; done"]
+CMD ["/bin/bash", "-c", "while true; do sleep 1493967397; done"]
