@@ -19,14 +19,14 @@ rm -rf /etc/dpkg/dpkg.cfg.d/02apt-speedup
 rm -rf /var/cache/debconf/*-old
 rm -rf /var/lib/apt/lists/*
 rm -rf /usr/share/doc/*
-rm -rf /usr/share/man/* /usr/share/groff/* /usr/share/info/*
+rm -rf /usr/share/groff/* /usr/share/info/*
 rm -rf /usr/share/lintian/* /usr/share/linda/* /var/cache/man/*
+find /usr/share/man -type f -delete
 EOF
 
 echo /etc/dpkg/dpkg.cfg.d/01_nodoc
 cat <<-EOF > /etc/dpkg/dpkg.cfg.d/01_nodoc
 path-exclude /usr/share/doc/*
-path-exclude /usr/share/man/*
 path-exclude /usr/share/groff/*
 path-exclude /usr/share/info/*
 # lintian stuff is small, but really unnecessary
